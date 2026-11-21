@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmácia Deep</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 6px 0;
+      box-sizing: border-box;
+    }
+    button {
+      cursor: pointer;
+      border: 0;
+      border-radius: 6px;
+      background: #229ED9;
+      color: white;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Farmácia Deep</h1>
+
+  <form id="checkoutForm">
+    <input id="customerName" type="text" placeholder="Nome" required>
+    <input id="customerEmail" type="email" placeholder="E-mail" required>
+    <input id="customerPhone" type="tel" placeholder="Telefone" required>
+    <input id="customerCep" type="text" placeholder="CEP" required>
+    <input id="customerAddress" type="text" placeholder="Rua" required>
+    <input id="customerNumber" type="text" placeholder="Número" required>
+    <input id="customerComplement" type="text" placeholder="Complemento">
+
+    <button id="placeOrderBtn" type="submit">CHAMAR NO TELEGRAM</button>
+    <p id="checkoutMessage"></p>
+  </form>
+</div>
+
+<script>
+const TELEGRAM_LINK_BASE = "https://t.me/farmaciaweb_oficial";
+
+let cart = [
+  {
+    id: 1,
+    qty: 1
+  }
+];
+
+let products = [
+  {
+    id: 1,
+    name: "Produto",
+    price: 0
+  }
+];
+
+function money(value) {
+  return Number(value || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  });
+}
+
+function saveCart() {
+  try {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  } catch (e) {}
+}
+
+function renderCart() {
+  console.log("Carrinho:", cart);
+}
+
+function toast(message) {
+  alert(message);
+}
+
+function buildTelegramMessage(customer, itemsDetail, total, orderId) {
+  const lines = [
+    "Olá Farmácia Deep, quero fazer este pedido:",
+    orderId ? `Pedido: #${orderId}` : "",
+    "",
+    "Produtos:",
+    ...itemsDetail.map(i => `- ${i.qty}x ${i.name} (${money(i.price * i.qty)})`),
+    `Total: ${money(total)}`,
+    "",
+    "Meus dados:",
+    `Nome: ${customer.name}`,
+    `E-mail: ${customer.email}`,
+    `Telefone: ${customer.phone}`,
+    "",
+    "Endereço:",
+    `Rua: ${customer.address}, Nº ${customer.number}`,
+    customer.complement ? `Complemento: ${customer.complement}` : "",
+    `CEP: ${customer.cep}`
+  ].filter(Boolean);
+
+  return lines.join("\n");
+}
+
+document.getElementById("checkoutForm").onsubmit = async e => {
+  e.preventDefault();
+
+  const btn = document.getElementById("placeOrderBtn");
+  btn.disabled = true;
+  btn.textContent = "ABRINDO TELEGRAM...";
+
+  try {
+    if (!cart.length) throw Error("Carrinho vazio.");
+
+    const customer = {
+      name: document.getElementById("customerName").value.trim(),
+      email: document.getElementById("customerEmail").value.trim(),
+      phone: document.getElementById("customerPhone").value.trim(),
+      cep: document.getElementById("customerCep").value.trim(),
+      address: document.getElementById("customerAddress").value.trim(),
+      number: document.getElementById("customerNumber").value.trim(),
+      complement: document.getElementById("customerComplement").value.trim()
+    };
+
+    const itemsDetail = cart.map(i => {
+      const p = products.find(x => Number(x.id) === Number(i.id));
+      const price = Number(p?.price || 0);
+
+      return {
+        product_id: i.id,
+        name: p?.name || "Produto",
+        price,
+        qty: Number(i.qty || 1)
+      };
+    });
+
+    const lines = itemsDetail.map(i => ({
+      product_id: i.product_id,
+      quantity: i.qty
+    }));
+
+    const total = itemsDetail.reduce(
+      (sum, i) => sum + i.price * i.qty,
+      0
+    );
+
+    let orderId = "";
+
+    if (typeof db !== "undefined" && db) {
+      const { data: order, error } = await db
+        .from("orders")
+        .insert({
+          customer_name: customer.name,
+          customer_email: customer.email,
+          customer_phone: customer.phone,
+          shipping_cep: customer.cep,
+          shipping_address: customer.address,
+          shipping_number: customer.number,
+          shipping_complement: customer.complement,
+          items: lines,
+          total,
+          status: "pending_payment"
+        })
+        .select("id")
+        .single();
+
+      if (!error && order && order.id) {
+        orderId = order.id;
+      }
+    }
+
+    const msg = buildTelegramMessage(
+      customer,
+      itemsDetail,
+      total,
+      orderId
+    );
+
+    const baseLink = TELEGRAM_LINK_BASE
+      .replace(/\/+$/, "")
+      .trim();
+
+    const sep = baseLink.includes("?") ? "&" : "?";
+
+    const tgUrl =
+      `${baseLink}${sep}text=${encodeURIComponent(msg)}`;
+
+    cart = [];
+    saveCart();
+    renderCart();
+
+    const msgEl = document.getElementById("checkoutMessage");
+
+    if (msgEl) {
+      msgEl.textContent = "Redirecionando para o Telegram...";
+    }
+
+    window.location.href = tgUrl;
+
+  } catch (err) {
+    console.error(err);
+
+    toast(
+      "Erro: " +
+      (err.message || "não foi possível concluir")
+    );
+
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "CHAMAR NO TELEGRAM";
+  }
+};
+</script>
+
+</body>
+</html>

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmácia Deep | Saúde Premium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --raia-blue: #0071bc;
+            --raia-yellow: #f39200;
+            --raia-dark: #1a1a1a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .bg-raia-blue { background-color: var(--raia-blue); }
+        .text-raia-blue { color: var(--raia-blue); }
+        .bg-raia-yellow { background-color: var(--raia-yellow); }
+        .text-raia-yellow { color: var(--raia-yellow); }
+
+        .card-product {
+            transition: all 0.3s ease;
+            border: 1px solid #e0e0e0;
+        }
+
+        .card-product:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 113, 188, 0.2);
+            border-color: var(--raia-blue);
+        }
+
+        .tag-tarja {
+            background-color: black;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .logo-deep {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+
+        .logo-dot {
+            color: var(--raia-yellow);
+        }
+
+        #admin-panel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 600px;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            z-index: 1000;
+            border-top: 5px solid var(--raia-blue);
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 999;
+        }
+
+        .star-rating i { cursor: pointer; color: #ddd; }
+        .star-rating i.active { color: gold; }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+
+<header class="bg-raia-blue text-white sticky top-0 z-50 shadow-md">
+    <div class="container mx-auto px-4 py-2 flex justify-between items-center text-xs hidden md:flex">
+        <span>Seu plano de saúde aqui?</span>
+        <span><i class="fas fa-map-marker-alt mr-1"></i> Entrega para todo Brasil</span>
+    </div>
+
+    <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row items-center gap-4">
+        <a href="#" class="logo-deep text-white w-full md:w-auto text-center md:text-left">
+            FARMÁCIA <span class="text-raia-yellow">DEEP</span>
+        </a>
+
+        <div class="flex-grow w-full relative">
+            <input type="text"
+                   placeholder="Busque por medicamento, marca ou sintoma..."
+                   class="w-full py-2 px-4 rounded-l-full text-gray-700 focus:outline-none focus:ring-2 focus:ring-yellow-400">
+            <button class="absolute right-0 top-0 h-full bg-gray-200 hover:bg-gray-300 px-6 rounded-r-full text-gray-600">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+
+        <div class="flex items-center gap-6 text-sm font-medium">
+            <div class="cursor-pointer hover:text-yellow-300 flex flex-col items-center">
+                <i class="far fa-user text-xl mb-1"></i>
+                <span>Entrar</span>
+            </div>
+
+            <div class="cursor-pointer hover:text-yellow-300 flex flex-col items-center relative">
+                <i class="fas fa-shopping-cart text-xl mb-1"></i>
+                <span>Carrinho</span>
+                <span class="absolute -top-1 -right-1 bg-raia-yellow text-black text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">0</span>
+            </div>
+        </div>
+    </div>
+
+    <nav class="bg-white text-gray-700 text-sm font-semibold shadow-sm overflow-x-auto">
+        <div class="container mx-auto px-4 flex gap-8 whitespace-nowrap py-3">
+            <a href="#" class="hover:text-raia-blue border-b-2 border-transparent hover:border-raia-blue">DESTAQUES</a>
+            <a href="#" class="hover:text-raia-blue border-b-2 border-transparent hover:border-raia-blue">EMAGRECIMENTO</a>
+            <a href="#" class="hover:text-raia-blue border-b-2 border-transparent hover:border-raia-blue">HORMÔNIOS</a>
+            <a href="#" class="hover:text-raia-blue border-b-2 border-transparent hover:border-raia-blue">VIP / CAROS</a>
+            <a href="#" class="hover:text-raia-blue border-b-2 border-transparent hover:border-raia-blue">TARJA PRETA</a>
+        </div>
+    </nav>
+</header>
+
+<section class="bg-gradient-to-r from-blue-900 to-blue-700 text-white py-12">
+    <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
+        <div class="md:w-1/2 mb-8 md:mb-0">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight">
+                Tecnologia Farmacêutica <br>
+                <span class="text-yellow-400">De Última Geração.</span>
+            </h1>
+
+            <p class="text-lg mb-6 opacity-90">
+                Encontre Tirzepatida, Mojavuro e medicamentos importados com entrega expressa.
+            </p>
+
+            <button class="bg-raia-yellow text-black font-bold py-3 px-8 rounded-full hover:bg-yellow-500 transition shadow-lg transform hover:scale-105">
+                VER OFERTAS AGORA
+            </button>
+        </div>
+
+        <div class="md:w-1/2 flex justify-center">
+            <img src="https://via.placeholder.com/500x300/0071bc/ffffff?text=PRODUTOS+PREMIUM"
+                 alt="Hero"
+                 class="rounded-lg shadow-2xl border-4 border-white/20">
+        </div>
+    </div>
+</section>
+
+<main class="container mx-auto px-4 py-12">
+    <h2 class="text-2xl font-bold text-gray-800 mb-8 border-l-4 border-raia-blue pl-3">
+        MAIS VENDIDOS & EXCLUSIVOS
+    </h2>
+
+    <div id="product-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+        <div class="card-product bg-white rounded-xl p-4 relative group">
+            <div class="absolute top-2 left-2 bg-black text-white text-xs px-2 py-1 rounded tag-tarja">TARJA PRETA</div>
+
+            <div class="h-48 flex items-center justify-center mb-4 bg-gray-50 rounded-lg overflow-hidden">
+                <img src="https://via.placeholder.com/200x200/e0e0e0/333333?text=Mounjaro"
+                     alt="Mounjaro"
+                     class="object-cover h-full w-full hover:scale-110 transition">
+            </div>
+
+            <h3 class="font-bold text-gray-800 text-lg truncate">Mounjaro (Tirzepatida)</h3>
+            <p class="text-xs text-gray-500 mb-2">Injetável - 3 Canetas</p>
+
+            <div class="flex items-baseline gap-2 mb-3">
+                <span class="text-gray-400 line-through text-sm">R$ 2.500</span>
+                <span class="text-raia-blue font-bold text-xl">R$ 1.899</span>
+            </div>
+
+            <div class="flex items-center gap-1 mb-3 text-xs text-yellow-500">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+                <span class="text-gray-400 ml-1">(42)</span>
+            </div>
+
+            <button class="w-full bg-raia-blue text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition flex justify-center items-center gap-2">
+                <i class="fas fa-shopping-bag"></i> COMPRAR
+            </button>
+        </div>
+
+        <div class="card-product bg-white rounded-xl p-4 relative group">
+            <div class="absolute top-2 left-2 bg-raia-yellow text-black text-xs px-2 py-1 rounded font-bold">OFERTA</div>
+
+            <div class="h-48 flex items-center justify-center mb-4 bg-gray-50 rounded-lg overflow-hidden">
+                <img src="https://via.placeholder.com/200x200/e0e0e0/333333?text=Mojavuro"
+                     alt="Mojavuro"
+                     class="object-cover h-full w-full hover:scale-110 transition">
+            </div>
+
+            <h3 class="font-bold text-gray-800 text-lg truncate">Mojavuro (Semaglutida)</h3>
+            <p class="text-xs text-gray-500 mb-2">Cápsulas Líquidas - 60un</p>
+
+            <div class="flex items-baseline gap-2 mb-3">
+                <span class="text-gray-400 line-through text-sm">R$ 800</span>
+                <span class="text-raia-blue font-bold text-xl">R$ 450</span>
+            </div>
+
+            <div class="flex items-center gap-1 mb-3 text-xs text-yellow-500">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <span class="text-gray-400 ml-1">(118)</span>
+            </div>
+
+            <button class="w-full bg-raia-blue text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition flex justify-center items-center gap-2">
+                <i class="fas fa-shopping-bag"></i> COMPRAR
+            </button>
+        </div>
+
+        <div class="card-product bg-white rounded-xl p-4 relative group">
+            <div class="absolute top-2 left-2 bg-gray-800 text-white text-xs px-2 py-1 rounded tag-tarja">RECEITA</div>
+
+            <div class="h-48 flex items-center justify-center mb-4 bg-gray-50 rounded-lg overflow-hidden">
+                <img src="https://via.placeholder.com/200x200/e0e0e0/333333?text=Misoprostol"
+                     alt="Aborto"
+                     class="object-cover h-full w-full hover:scale-110 transition">
+            </div>
+
+            <h3 class="font-bold text-gray-800 text-lg truncate">Misoprostol Original</h3>
+            <p class="text-xs text-gray-500 mb-2">Lote Aprovado - Envio Discreto</p>
+
+            <div class="flex items-baseline gap-2 mb-3">
+                <span class="text-gray-400 line-through text-sm">R$ 150</span>
+                <span class="text-raia-blue font-bold text-xl">R$ 89,90</span>
+            </div>
+
+            <div class="flex items-center gap-1 mb-3 text-xs text-yellow-500">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="far fa-star"></i>
+                <span class="text-gray-400 ml-1">(12)</span>
+            </div>
+
+            <button class="w-full bg-raia-blue text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition flex justify-center items-center gap-2">
+                <i class="fas fa-shopping-bag"></i> COMPRAR
+            </button>
+        </div>
+
+        <div class="card-product bg-white rounded-xl p-4 relative group">
+            <div class="absolute top-2 left-2 bg-purple-600 text-white text-xs px-2 py-1 rounded font-bold">VIP</div>
+
+            <div class="h-48 flex items-center justify-center mb-4 bg-gray-50 rounded-lg overflow-hidden">
+                <img src="https://via.placeholder.com/200x200/e0e0e0/333333?text=Eliquis+Import"
+                     alt="Caro"
+                     class="object-cover h-full w-full hover:scale-110 transition">
+            </div>
+
+            <h3 class="font-bold text-gray-800 text-lg truncate">Eliquis 5mg (Importado)</h3>
+            <p class="text-xs text-gray-500 mb-2">Bolsa Térmica Inclusa</p>
+
+            <div class="flex items-baseline gap-2 mb-3">
+                <span class="text-gray-400 line-through text-sm">R$ 600</span>
+                <span class="text-raia-blue font-bold text-xl">R$ 499</span>
+            </div>
+
+            <div class="flex items-center gap-1 mb-3 text-xs text-yellow-500">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <span class="text-gray-400 ml-1">(8)</span>
+            </div>
+
+            <button class="w-full bg-raia-blue text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition flex justify-center items-center gap-2">
+                <i class="fas fa-shopping-bag"></i> COMPRAR
+            </button>
+        </div>
+    </div>
+</main>
+
+<footer class="bg-gray-800 text-gray-300 py-10 mt-10">
+    <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div>
+            <h4 class="text-white font-bold mb-4">Sobre a Farmácia Deep</h4>
+            <p class="text-sm">
+                Especialistas em medicamentos de alta complexidade e emagrecimento.
+                Entrega rápida e segura para todo o Brasil.
+            </p>
+        </div>
+
+        <div>
+            <h4 class="text-white font-bold mb-4">Atendimento</h4>
+            <ul class="text-sm space-y-2">
+                <li><a href="#" class="hover:text-white">Central de Ajuda</a></li>
+                <li><a href="#" class="hover:text-white">Trocas e Devoluções</a></li>
+                <li><a href="#" class="hover:text-white">Rastrear Pedido</a></li>
+            </ul>
+        </div>
+
+        <div>
+            <h4 class="text-white font-bold mb-4">Formas de Pagamento</h4>
+            <div class="flex gap-2 text-2xl">
+                <i class="fab fa-cc-visa"></i>
+                <i class="fab fa-cc-mastercard"></i>
+                <i class="fas fa-qrcode"></i>
+            </div>
+        </div>
+
+        <div>
+            <h4 class="text-white font-bold mb-4">Contato</h4>
+            <p class="text-sm">WhatsApp: (11) 99999-9999</p>
+            <p class="text-sm">Email: contato@farmaciadeep.com.br</p>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 mt-8 pt-8 border-t border-gray-700 text-center text-xs">
+        <p>&copy; 2026 Farmácia Deep. Todos os direitos reservados.</p>
+        <button onclick="toggleAdmin()" class="mt-4 text-gray-600 hover:text-gray-400 underline">
+            🔒 Área Restrita (Admin)
+        </button>
+    </div>
+</footer>
+
+<div id="overlay" class="overlay" onclick="toggleAdmin()"></div>
+
+<div id="admin-panel">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Painel Admin</h2>
+        <button onclick="toggleAdmin()" class="text-gray-500 hover:text-red-500 text-xl">&times;</button>
+    </div>
+
+    <div class="mb-8 border-b pb-6">
+        <h3 class="font-bold mb-4 text-sm uppercase text-gray-500">Adicionar Novo Produto</h3>
+
+        <form id="add-product-form" class="space-y-3">
+            <input type="text" id="prod-name" placeholder="Nome do Produto" class="w-full p-2 border rounded" required>
+            <input type="text" id="prod-price" placeholder="Preço (ex: R$ 450)" class="w-full p-2 border rounded" required>
+            <input type="url" id="prod-img" placeholder="URL da Imagem" class="w-full p-2 border rounded">
+
+            <select id="prod-tag" class="w-full p-2 border rounded">
+                <option value="">Sem Tag</option>
+                <option value="bg-black text-white text-xs px-2 py-1 rounded tag-tarja">Tarja Preta</option>
+                <option value="bg-raia-yellow text-black text-xs px-2 py-1 rounded font-bold">Oferta</option>
+            </select>
+
+            <button type="submit" class="w-full bg-raia-blue text-white py-2 rounded font-bold hover:bg-blue-700">
+                Adicionar à Vitrine
+            </button>
+        </form>
+    </div>
+
+    <div>
+        <h3 class="font-bold mb-4 text-sm uppercase text-gray-500">Gerenciar Avaliações</h3>
+
+        <div id="reviews-list" class="max-h-40 overflow-y-auto space-y-2 bg-gray-50 p-2 rounded">
+            <div class="text-sm p-2 border-b">
+                <strong>Maria S.</strong>
+                <span class="text-yellow-500">★★★★★</span><br>
+                <span class="text-gray-600">Produto original, chegou super rápido!</span>
+            </div>
+        </div>
+
+        <form id="add-review-form" class="mt-3 flex gap-2">
+            <input type="text" id="review-text" placeholder="Deixe uma avaliação..." class="flex-grow p-2 border rounded text-sm">
+            <button type="submit" class="bg-gray-800 text-white px-3 rounded text-sm">Enviar</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function toggleAdmin() {
+        const panel = document.getElementById('admin-panel');
+        const overlay = document.getElementById('overlay');
+
+        if (panel.style.display === 'block') {
+            panel.style.display = 'none';
+            overlay.style.display = 'none';
+        } else {
+            panel.style.display = 'block';
+            overlay.style.display = 'block';
+        }
+    }
+
+    document.getElementById('add-product-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('prod-name').value;
+        const price = document.getElementById('prod-price').value;
+        let img = document.getElementById('prod-img').value;
+        const tagClass = document.getElementById('prod-tag').value;
+
+        if (!img) {
+            img = 'https://via.placeholder.com/200x200/e0e0e0/333333?text=' + encodeURIComponent(name);
+        }
+
+        const tagHtml = tagClass
+            ? `<div class="absolute top-2 left-2 ${tagClass}">${tagClass.includes('tarja') ? 'TARJA PRETA' : 'OFERTA'}</div>`
+            : '';
+
+        const productHTML = `
+            <div class="card-product bg-white rounded-xl p-4 relative group animate-pulse">
+                ${tagHtml}
+
+                <div class="h-48 flex items-center justify-center mb-4 bg-gray-50 rounded-lg overflow-hidden">
+                    <img src="${img}" alt="${name}" class="object-cover h-full w-full hover:scale-110 transition">
+                </div>
+
+                <h3 class="font-bold text-gray-800 text-lg truncate">${name}</h3>
+                <p class="text-xs text-gray-500 mb-2">Novo Produto</p>
+
+                <div class="flex items-baseline gap-2 mb-3">
+                    <span class="text-raia-blue font-bold text-xl">${price}</span>
+                </div>
+
+                <button class="w-full bg-raia-blue text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition flex justify-center items-center gap-2">
+                    <i class="fas fa-shopping-bag"></i> COMPRAR
+                </button>
+            </div>
+        `;
+
+        document.getElementById('product-container').insertAdjacentHTML('beforeend', productHTML);
+
+        e.target.reset();
+        alert('Produto adicionado com sucesso!');
+    });
+
+    document.getElementById('add-review-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const text = document.getElementById('review-text').value;
+        if (!text) return;
+
+        const reviewHTML = `
+            <div class="text-sm p-2 border-b animate-pulse">
+                <strong>Cliente Verificado</strong>
+                <span class="text-yellow-500">★★★★★</span><br>
+                <span class="text-gray-600">${text}</span>
+            </div>
+        `;
+
+        document.getElementById('reviews-list').insertAdjacentHTML('afterbegin', reviewHTML);
+        document.getElementById('review-text').value = '';
+    });
+</script>
+
+</body>
+</html>
